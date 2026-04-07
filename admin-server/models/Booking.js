@@ -8,6 +8,7 @@ const bookingSchema = new mongoose.Schema({
 
     // Status tracking
     status: { type: String, enum: ['Completed', 'Failed', 'Pending'], default: 'Completed' },
+    isRead: { type: Boolean, default: false },
 
     // Core Consultation Info
     consultationType: { type: String, required: true },

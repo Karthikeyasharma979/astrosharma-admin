@@ -1,8 +1,36 @@
-import { Bell, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import axios from '../utils/axios';
 import useAuthStore from '../store/authStore';
+import { Bell, Search } from 'lucide-react';
 
 const Header = () => {
     const admin = useAuthStore(state => state.admin);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    const fetchStats = async () => {
+        try {
+            const { data } = await axios.get('/admin/stats');
+            setUnreadCount(data.totals?.unreadTotal || 0);
+        } catch (error) {
+            console.error("Failed to fetch notification count", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchStats();
+        // Poll for new notifications every 30 seconds
+        const interval = setInterval(fetchStats, 30000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const handleClearNotifications = async () => {
+        try {
+            await axios.put('/admin/notifications/read');
+            setUnreadCount(0);
+        } catch (error) {
+            console.error("Failed to clear notifications", error);
+        }
+    };
 
     return (
         <header className="h-16 border-b border-slate-800 bg-slate-900/60 backdrop-blur-xl flex items-center justify-between px-8 sticky top-0 z-30">
@@ -18,9 +46,20 @@ const Header = () => {
 
             {/* Right Context */}
             <div className="flex items-center gap-6 ml-auto">
-                <button className="relative p-2 text-slate-400 hover:text-slate-200 transition-colors rounded-full hover:bg-slate-800">
+                <button 
+                    onClick={handleClearNotifications}
+                    className="relative p-2 text-slate-400 hover:text-slate-200 transition-colors rounded-full hover:bg-slate-800 group"
+                    title={unreadCount > 0 ? `${unreadCount} unread items` : 'No new notifications'}
+                >
                     <Bell size={20} />
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-purple-500 rounded-full ring-2 ring-slate-900 shadow-sm shadow-purple-500/50 animate-pulse"></span>
+                    {unreadCount > 0 && (
+                        <>
+                            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-purple-500 rounded-full ring-2 ring-slate-900 shadow-sm shadow-purple-500/50 animate-pulse"></span>
+                            <span className="absolute -top-1 -right-1 bg-purple-600 text-[10px] font-bold text-white px-1.5 py-0.5 rounded-full border border-slate-900 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {unreadCount}
+                            </span>
+                        </>
+                    )}
                 </button>
                 
                 <div className="flex items-center gap-3 border-l border-slate-700 pl-6">

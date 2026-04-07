@@ -66,7 +66,9 @@ const getContacts = async (req, res) => {
 const getDashboardStats = async (req, res) => {
     try {
         const totalBookings = await Booking.countDocuments();
+        const unreadBookings = await Booking.countDocuments({ isRead: false });
         const totalContacts = await Contact.countDocuments();
+        const unreadContacts = await Contact.countDocuments({ isRead: false });
         
         const recentBookings = await Booking.find({}).sort({ createdAt: -1 }).limit(5);
         const recentContacts = await Contact.find({}).sort({ createdAt: -1 }).limit(5);
@@ -74,7 +76,8 @@ const getDashboardStats = async (req, res) => {
         res.json({
             totals: {
                 bookings: totalBookings,
-                contacts: totalContacts
+                contacts: totalContacts,
+                unreadTotal: unreadBookings + unreadContacts
             },
             recentActivities: {
                 bookings: recentBookings,
@@ -144,12 +147,27 @@ const sendConfirmationEmail = async (req, res) => {
     }
 };
 
+// @desc    Mark notifications as read
+// @route   PUT /api/admin/notifications/read
+// @access  Private/Admin
+const markNotificationsRead = async (req, res) => {
+    try {
+        await Booking.updateMany({ isRead: false }, { isRead: true });
+        await Contact.updateMany({ isRead: false }, { isRead: true });
+        res.json({ message: 'All notifications marked as read' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to mark notifications as read' });
+    }
+};
+
 module.exports = {
     loginAdmin,
     getBookings,
     getBookingById,
     updateBookingStatus,
     sendConfirmationEmail,
+    markNotificationsRead,
     getContacts,
     getDashboardStats
 };

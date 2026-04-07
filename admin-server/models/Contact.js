@@ -5,7 +5,8 @@ const contactSchema = new mongoose.Schema({
     email: { type: String, required: true },
     message: { type: String, required: true },
     // Status to track if the inquiry was addressed
-    status: { type: String, enum: ['New', 'In Progress', 'Resolved'], default: 'New' }
+    status: { type: String, enum: ['New', 'In Progress', 'Resolved'], default: 'New' },
+    isRead: { type: Boolean, default: false }
 }, {
     timestamps: true
 });

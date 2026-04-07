@@ -21,5 +21,6 @@ router.put('/bookings/:id/status', protect, updateBookingStatus);
 router.post('/bookings/:id/confirm', protect, sendConfirmationEmail);
 router.get('/contacts', protect, getContacts);
 router.get('/stats', protect, getDashboardStats);
+router.put('/notifications/read', protect, markNotificationsRead);
 
 module.exports = router;
