@@ -6,6 +6,7 @@ const {
     getBookingById,
     updateBookingStatus,
     sendConfirmationEmail,
+    markNotificationsRead,
     getContacts,
     getDashboardStats
 } = require('../controllers/adminController');
