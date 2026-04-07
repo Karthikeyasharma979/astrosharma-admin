@@ -15,6 +15,7 @@ app.use(cors({
 app.use(express.json());
 
 // Routes
+app.get('/', (req, res) => res.json({ status: 'Server is running', service: 'AstroAdmin API' }));
 app.use('/api/admin', adminRoutes);
 
 // Detailed Request Logging Middleware (Development)
