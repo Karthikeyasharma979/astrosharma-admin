@@ -184,30 +184,48 @@ const BookingDetail = () => {
                     </div>
 
                     {/* Marriage Matching Section (if applicable) */}
-                    {(booking.girlName || booking.boyName) && (
+                    {(booking.girlName || booking.girl2Name || booking.boyName) && (
                         <div className="glass-panel p-8">
                             <h3 className="text-lg font-bold text-slate-100 mb-6 flex items-center gap-2">
                                 <Heart size={20} className="text-pink-500" /> Marriage Matching Details
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="p-6 bg-slate-900/30 rounded-2xl border border-slate-700/30 space-y-4">
-                                    <h4 className="text-slate-400 font-semibold mb-2">Partner 1 (Girl)</h4>
-                                    <div className="space-y-2 text-sm italic">
-                                        <div className="flex justify-between"><span className="text-slate-500">Name</span><span className="text-slate-200">{booking.girlName || 'N/A'}</span></div>
-                                        <div className="flex justify-between"><span className="text-slate-500">DOB</span><span className="text-slate-200">{booking.girlDob || 'N/A'}</span></div>
-                                        <div className="flex justify-between"><span className="text-slate-500">Time</span><span className="text-slate-200">{booking.girlTime || 'N/A'}</span></div>
-                                        <div className="flex justify-between"><span className="text-slate-500">Place</span><span className="text-slate-200">{booking.girlPlace || 'N/A'}</span></div>
+                            <div className={`grid grid-cols-1 md:grid-cols-${(booking.girlName && booking.girl2Name) ? '3' : '2'} gap-8`}>
+                                {/* Bride 1 */}
+                                {booking.girlName && (
+                                    <div className="p-6 bg-slate-900/30 rounded-2xl border border-slate-700/30 space-y-4">
+                                        <h4 className="text-slate-400 font-semibold mb-2">Partner 1 (Bride)</h4>
+                                        <div className="space-y-2 text-sm italic">
+                                            <div className="flex justify-between"><span className="text-slate-500">Name</span><span className="text-slate-200">{booking.girlName || 'N/A'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">DOB</span><span className="text-slate-200">{booking.girlDob || 'N/A'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">Time</span><span className="text-slate-200">{booking.girlTime || 'N/A'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">Place</span><span className="text-slate-200">{booking.girlPlace || 'N/A'}</span></div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="p-6 bg-slate-900/30 rounded-2xl border border-slate-700/30 space-y-4">
-                                    <h4 className="text-slate-400 font-semibold mb-2">Partner 2 (Boy)</h4>
-                                    <div className="space-y-2 text-sm italic">
-                                        <div className="flex justify-between"><span className="text-slate-500">Name</span><span className="text-slate-200">{booking.boyName || 'N/A'}</span></div>
-                                        <div className="flex justify-between"><span className="text-slate-500">DOB</span><span className="text-slate-200">{booking.boyDob || 'N/A'}</span></div>
-                                        <div className="flex justify-between"><span className="text-slate-500">Time</span><span className="text-slate-200">{booking.boyTime || 'N/A'}</span></div>
-                                        <div className="flex justify-between"><span className="text-slate-500">Place</span><span className="text-slate-200">{booking.boyPlace || 'N/A'}</span></div>
+                                )}
+                                {/* Bride 2 (if present) */}
+                                {booking.girl2Name && (
+                                    <div className="p-6 bg-slate-900/30 rounded-2xl border border-slate-700/30 space-y-4">
+                                        <h4 className="text-slate-400 font-semibold mb-2">Partner {(booking.girlName ? 2 : 1)} (Bride)</h4>
+                                        <div className="space-y-2 text-sm italic">
+                                            <div className="flex justify-between"><span className="text-slate-500">Name</span><span className="text-slate-200">{booking.girl2Name || 'N/A'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">DOB</span><span className="text-slate-200">{booking.girl2Dob || 'N/A'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">Time</span><span className="text-slate-200">{booking.girl2Time || 'N/A'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">Place</span><span className="text-slate-200">{booking.girl2Place || 'N/A'}</span></div>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
+                                {/* Groom */}
+                                {booking.boyName && (
+                                    <div className="p-6 bg-slate-900/30 rounded-2xl border border-slate-700/30 space-y-4">
+                                        <h4 className="text-slate-400 font-semibold mb-2">Partner {(booking.girlName && booking.girl2Name) ? 3 : 2} (Groom)</h4>
+                                        <div className="space-y-2 text-sm italic">
+                                            <div className="flex justify-between"><span className="text-slate-500">Name</span><span className="text-slate-200">{booking.boyName || 'N/A'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">DOB</span><span className="text-slate-200">{booking.boyDob || 'N/A'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">Time</span><span className="text-slate-200">{booking.boyTime || 'N/A'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">Place</span><span className="text-slate-200">{booking.boyPlace || 'N/A'}</span></div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
