@@ -7,7 +7,8 @@ const bookingSchema = new mongoose.Schema({
     razorpay_signature: { type: String, required: true },
 
     // Status tracking
-    status: { type: String, enum: ['Completed', 'Failed', 'Pending'], default: 'Completed' },
+    status: { type: String, enum: ['Completed', 'Failed', 'Pending'], default: 'Pending' },
+    completedAt: { type: Date },
     isRead: { type: Boolean, default: false },
 
     // Core Consultation Info

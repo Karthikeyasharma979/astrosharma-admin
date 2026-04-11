@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
-import { ArrowLeft, User, Phone, Mail, Calendar, MapPin, Clock, CreditCard, HelpCircle, Heart, Loader2 } from 'lucide-react';
+import { ArrowLeft, Phone, Mail, Calendar, Clock, CreditCard, HelpCircle, Heart, Loader2, Trash2 } from 'lucide-react';
+import Toast from '../components/Toast';
 
 const BookingDetail = () => {
     const { id } = useParams();
@@ -9,13 +10,21 @@ const BookingDetail = () => {
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [selectedStatus, setSelectedStatus] = useState('Pending');
+    const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
+
+    const showToast = (message, type = 'success') => {
+        setToast({ visible: true, message, type });
+    };
 
     useEffect(() => {
         const fetchBooking = async () => {
             try {
                 const { data } = await axios.get(`/admin/bookings/${id}`);
                 setBooking(data);
+                setSelectedStatus(data.status || 'Pending');
             } catch (err) {
                 setError(err.response?.data?.message || 'Failed to fetch booking details');
             } finally {
@@ -26,14 +35,15 @@ const BookingDetail = () => {
         fetchBooking();
     }, [id]);
 
-    const handleStatusUpdate = async (newStatus) => {
+    const handleStatusUpdate = async () => {
         setActionLoading(true);
         try {
-            const { data } = await axios.put(`/admin/bookings/${id}/status`, { status: newStatus });
+            const { data } = await axios.put(`/admin/bookings/${id}/status`, { status: selectedStatus });
             setBooking(data);
-            alert(`Status updated to ${newStatus}`);
+            setSelectedStatus(data.status || 'Pending');
+            showToast(`Status updated to ${selectedStatus}`, 'success');
         } catch (err) {
-            alert('Failed to update status');
+            showToast('Failed to update status', 'error');
         } finally {
             setActionLoading(false);
         }
@@ -43,11 +53,27 @@ const BookingDetail = () => {
         setActionLoading(true);
         try {
             const { data } = await axios.post(`/admin/bookings/${id}/confirm`);
-            alert(data.message);
+            showToast(data.message, 'success');
         } catch (err) {
-            alert('Failed to send email');
+            showToast(err.response?.data?.message || 'Failed to send email', 'error');
         } finally {
             setActionLoading(false);
+        }
+    };
+
+    const handleDeleteBooking = async () => {
+        const confirmed = window.confirm('Are you sure you want to delete this booking?');
+        if (!confirmed) return;
+
+        setDeleteLoading(true);
+        try {
+            await axios.delete(`/admin/bookings/${id}`);
+            showToast('Booking deleted successfully', 'success');
+            navigate('/bookings');
+        } catch (err) {
+            showToast('Failed to delete booking', 'error');
+        } finally {
+            setDeleteLoading(false);
         }
     };
 
@@ -70,6 +96,13 @@ const BookingDetail = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Toast
+                visible={toast.visible}
+                message={toast.message}
+                type={toast.type}
+                onClose={() => setToast(prev => ({ ...prev, visible: false }))}
+            />
+
             <header className="flex items-center gap-4">
                 <button 
                     onClick={() => navigate('/bookings')}
@@ -162,6 +195,7 @@ const BookingDetail = () => {
                                     <div className="space-y-2 text-sm italic">
                                         <div className="flex justify-between"><span className="text-slate-500">Name</span><span className="text-slate-200">{booking.girlName || 'N/A'}</span></div>
                                         <div className="flex justify-between"><span className="text-slate-500">DOB</span><span className="text-slate-200">{booking.girlDob || 'N/A'}</span></div>
+                                        <div className="flex justify-between"><span className="text-slate-500">Time</span><span className="text-slate-200">{booking.girlTime || 'N/A'}</span></div>
                                         <div className="flex justify-between"><span className="text-slate-500">Place</span><span className="text-slate-200">{booking.girlPlace || 'N/A'}</span></div>
                                     </div>
                                 </div>
@@ -170,6 +204,7 @@ const BookingDetail = () => {
                                     <div className="space-y-2 text-sm italic">
                                         <div className="flex justify-between"><span className="text-slate-500">Name</span><span className="text-slate-200">{booking.boyName || 'N/A'}</span></div>
                                         <div className="flex justify-between"><span className="text-slate-500">DOB</span><span className="text-slate-200">{booking.boyDob || 'N/A'}</span></div>
+                                        <div className="flex justify-between"><span className="text-slate-500">Time</span><span className="text-slate-200">{booking.boyTime || 'N/A'}</span></div>
                                         <div className="flex justify-between"><span className="text-slate-500">Place</span><span className="text-slate-200">{booking.boyPlace || 'N/A'}</span></div>
                                     </div>
                                 </div>
@@ -199,6 +234,14 @@ const BookingDetail = () => {
                                     <span className="text-slate-500">Gateway Status</span>
                                     <span className="text-emerald-400">Verified</span>
                                 </div>
+                                <div className="flex justify-between text-xs py-1">
+                                    <span className="text-slate-500">Completed At</span>
+                                    <span className="text-slate-300">
+                                        {booking.status === 'Completed'
+                                            ? new Date(booking.completedAt || booking.createdAt).toLocaleString()
+                                            : 'N/A'}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -207,19 +250,37 @@ const BookingDetail = () => {
                     <div className="glass-panel p-6 bg-gradient-to-br from-slate-800 to-slate-900 border-purple-500/20 shadow-purple-500/5">
                         <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4 italic">Management Actions</h3>
                         <div className="space-y-3">
+                            <select
+                                value={selectedStatus}
+                                onChange={(e) => setSelectedStatus(e.target.value)}
+                                disabled={actionLoading || deleteLoading}
+                                className="w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            >
+                                <option value="Pending">Pending</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Failed">Failed</option>
+                            </select>
                             <button 
-                                onClick={() => handleStatusUpdate(booking.status === 'Failed' ? 'Completed' : 'Failed')}
-                                disabled={actionLoading}
+                                onClick={handleStatusUpdate}
+                                disabled={actionLoading || deleteLoading}
                                 className="w-full py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-medium rounded-lg transition-colors border border-slate-600 flex items-center justify-center gap-2"
                             >
-                                {actionLoading ? <Loader2 size={16} className="animate-spin" /> : (booking.status === 'Failed' ? 'Mark as Completed' : 'Mark as Failed')}
+                                {actionLoading ? <Loader2 size={16} className="animate-spin" /> : 'Update Status'}
                             </button>
                             <button 
                                 onClick={handleSendEmail}
-                                disabled={actionLoading}
+                                disabled={actionLoading || deleteLoading}
                                 className="w-full py-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-sm font-medium rounded-lg transition-colors border border-purple-500/30 flex items-center justify-center gap-2"
                             >
                                 {actionLoading ? <Loader2 size={16} className="animate-spin" /> : 'Send Confirmation Email'}
+                            </button>
+                            <button
+                                onClick={handleDeleteBooking}
+                                disabled={actionLoading || deleteLoading}
+                                className="w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-300 text-sm font-medium rounded-lg transition-colors border border-red-500/30 flex items-center justify-center gap-2"
+                            >
+                                {deleteLoading ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                                {deleteLoading ? 'Deleting Booking...' : 'Delete Booking'}
                             </button>
                         </div>
                     </div>

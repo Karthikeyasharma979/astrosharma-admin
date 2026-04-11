@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
 const Booking = require('../models/Booking');
 const Contact = require('../models/Contact');
+const { sendBookingConfirmationEmail } = require('../utils/mailer');
 
 // Generate JWT
 const generateToken = (id) => {
@@ -113,9 +114,17 @@ const getBookingById = async (req, res) => {
 const updateBookingStatus = async (req, res) => {
     try {
         const { status } = req.body;
+        const updatePayload = { status };
+
+        if (status === 'Completed') {
+            updatePayload.completedAt = new Date();
+        } else {
+            updatePayload.completedAt = null;
+        }
+
         const booking = await Booking.findByIdAndUpdate(
             req.params.id,
-            { status },
+            updatePayload,
             { new: true }
         );
         if (booking) {
@@ -129,20 +138,65 @@ const updateBookingStatus = async (req, res) => {
     }
 };
 
-// @desc    Send confirmation email (Mock)
+// @desc    Delete a booking
+// @route   DELETE /api/admin/bookings/:id
+// @access  Private/Admin
+const deleteBooking = async (req, res) => {
+    try {
+        const booking = await Booking.findByIdAndDelete(req.params.id);
+
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        res.json({ message: 'Booking deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to delete booking' });
+    }
+};
+
+// @desc    Delete a contact inquiry
+// @route   DELETE /api/admin/contacts/:id
+// @access  Private/Admin
+const deleteContact = async (req, res) => {
+    try {
+        const contact = await Contact.findByIdAndDelete(req.params.id);
+
+        if (!contact) {
+            return res.status(404).json({ message: 'Contact not found' });
+        }
+
+        res.json({ message: 'Contact deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to delete contact' });
+    }
+};
+
+// @desc    Send confirmation email
 // @route   POST /api/admin/bookings/:id/confirm
 // @access  Private/Admin
 const sendConfirmationEmail = async (req, res) => {
     try {
         const booking = await Booking.findById(req.params.id);
         if (!booking) return res.status(404).json({ message: 'Booking not found' });
-        
-        // Mocking email logic
-        console.log(`Sending confirmation email to: ${booking.email}`);
-        
+
+        await sendBookingConfirmationEmail(booking);
+
         res.json({ message: `Confirmation email sent to ${booking.email}` });
     } catch (error) {
         console.error(error);
+        if (error.code === 'MAIL_CONFIG_MISSING') {
+            return res.status(500).json({
+                message: 'Email service is not configured. Please set SMTP_HOST, SMTP_PORT, SMTP_USER and SMTP_PASS.',
+            });
+        }
+
+        if (error.code === 'MAIL_TO_MISSING') {
+            return res.status(400).json({ message: 'Booking does not have a valid email address.' });
+        }
+
         res.status(500).json({ message: 'Failed to send email' });
     }
 };
@@ -166,8 +220,10 @@ module.exports = {
     getBookings,
     getBookingById,
     updateBookingStatus,
+    deleteBooking,
     sendConfirmationEmail,
     markNotificationsRead,
     getContacts,
-    getDashboardStats
+    getDashboardStats,
+    deleteContact
 };

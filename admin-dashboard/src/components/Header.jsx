@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
 import axios from '../utils/axios';
 import useAuthStore from '../store/authStore';
-import { Bell, Search } from 'lucide-react';
+import { Bell, Menu, Search } from 'lucide-react';
 
-const Header = () => {
+const Header = ({ pageTitle, onOpenSidebar }) => {
     const admin = useAuthStore(state => state.admin);
     const [unreadCount, setUnreadCount] = useState(0);
+
+    const today = new Date().toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+    });
 
     const fetchStats = async () => {
         try {
@@ -33,42 +39,57 @@ const Header = () => {
     };
 
     return (
-        <header className="h-16 border-b border-slate-800 bg-slate-900/60 backdrop-blur-xl flex items-center justify-between px-8 sticky top-0 z-30">
-            {/* Search Bar */}
-            <div className="relative w-96 max-w-full hidden md:block">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                <input 
-                    type="text" 
-                    placeholder="Search bookings, users..." 
-                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-full py-2 pl-10 pr-4 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
-                />
-            </div>
+        <header className="sticky top-0 z-20 border-b border-slate-800/80 bg-slate-950/75 backdrop-blur-xl">
+            <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-10">
+                <div className="flex min-w-0 items-center gap-3">
+                    <button
+                        onClick={onOpenSidebar}
+                        className="rounded-lg border border-slate-700 bg-slate-900/80 p-2 text-slate-300 transition-colors hover:bg-slate-800 hover:text-white lg:hidden"
+                        aria-label="Open sidebar"
+                    >
+                        <Menu size={18} />
+                    </button>
 
-            {/* Right Context */}
-            <div className="flex items-center gap-6 ml-auto">
-                <button 
-                    onClick={handleClearNotifications}
-                    className="relative p-2 text-slate-400 hover:text-slate-200 transition-colors rounded-full hover:bg-slate-800 group"
-                    title={unreadCount > 0 ? `${unreadCount} unread items` : 'No new notifications'}
-                >
-                    <Bell size={20} />
-                    {unreadCount > 0 && (
-                        <>
-                            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-purple-500 rounded-full ring-2 ring-slate-900 shadow-sm shadow-purple-500/50 animate-pulse"></span>
-                            <span className="absolute -top-1 -right-1 bg-purple-600 text-[10px] font-bold text-white px-1.5 py-0.5 rounded-full border border-slate-900 opacity-0 group-hover:opacity-100 transition-opacity">
-                                {unreadCount}
-                            </span>
-                        </>
-                    )}
-                </button>
-                
-                <div className="flex items-center gap-3 border-l border-slate-700 pl-6">
-                    <div className="text-right hidden sm:block">
-                        <p className="text-sm font-medium text-slate-200">Admin User</p>
-                        <p className="text-xs text-slate-500">{admin?.email || 'admin@astrosharma.com'}</p>
+                    <div className="min-w-0">
+                        <p className="truncate text-lg font-semibold text-slate-100">{pageTitle}</p>
+                        <p className="text-xs uppercase tracking-[0.18em] text-slate-400">{today}</p>
                     </div>
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 ring-2 ring-slate-800 overflow-hidden shadow-md">
-                        <img src={`https://ui-avatars.com/api/?name=${admin?.email || 'A'}&background=random&color=fff`} alt="Admin" className="w-full h-full object-cover" />
+                </div>
+
+                <div className="relative hidden w-80 max-w-full xl:block">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={17} />
+                    <input
+                        type="text"
+                        placeholder="Search bookings, users, emails"
+                        className="w-full rounded-full border border-slate-700/70 bg-slate-900/80 py-2 pl-10 pr-4 text-sm text-slate-200 placeholder-slate-500 transition-all focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/40"
+                    />
+                </div>
+
+                <div className="flex items-center gap-2 sm:gap-4">
+                    <button
+                        onClick={handleClearNotifications}
+                        className="relative rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-100"
+                        title={unreadCount > 0 ? `${unreadCount} unread items` : 'No new notifications'}
+                    >
+                        <Bell size={20} />
+                        {unreadCount > 0 && (
+                            <>
+                                <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full bg-cyan-400 ring-2 ring-slate-950 shadow-sm shadow-cyan-500/50 animate-pulse"></span>
+                                <span className="absolute -right-1 -top-1 rounded-full border border-slate-900 bg-cyan-500 px-1.5 py-0.5 text-[10px] font-semibold text-slate-950">
+                                    {unreadCount}
+                                </span>
+                            </>
+                        )}
+                    </button>
+
+                    <div className="flex items-center gap-2 border-l border-slate-700 pl-3 sm:pl-4">
+                        <div className="hidden text-right sm:block">
+                            <p className="text-sm font-medium text-slate-200">Admin User</p>
+                            <p className="max-w-48 truncate text-xs text-slate-500">{admin?.email || 'admin@astrosharma.com'}</p>
+                        </div>
+                        <div className="h-9 w-9 overflow-hidden rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 ring-2 ring-slate-900 shadow-md shadow-cyan-900/40">
+                            <img src={`https://ui-avatars.com/api/?name=${admin?.email || 'A'}&background=random&color=fff`} alt="Admin" className="h-full w-full object-cover" />
+                        </div>
                     </div>
                 </div>
             </div>

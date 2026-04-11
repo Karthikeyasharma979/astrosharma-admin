@@ -100,8 +100,14 @@ const Dashboard = () => {
                                                 <p className="font-medium text-slate-200">{book.fullName || 'Anonymous'}</p>
                                                 <p className="text-sm text-slate-500">{book.consultationType}</p>
                                             </div>
-                                            <span className="px-2.5 py-1 text-xs font-medium bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20">
-                                                {book.status || 'Completed'}
+                                            <span className={`px-2.5 py-1 text-xs font-medium rounded-full border ${
+                                                (book.status || 'Pending') === 'Completed'
+                                                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                                    : (book.status || 'Pending') === 'Failed'
+                                                        ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                                                        : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                                            }`}>
+                                                {book.status || 'Pending'}
                                             </span>
                                         </div>
                                     </li>
