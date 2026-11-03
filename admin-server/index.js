@@ -7,22 +7,30 @@ const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
+// Deployed behind one proxy, so req.ip is the visitor's real address and can't be faked with a header
+app.set('trust proxy', 1);
+
 // Middleware
+const allowedOrigins = (process.env.CORS_ORIGIN || '').split(',').map(origin => origin.trim()).filter(Boolean);
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: allowedOrigins.length > 0 ? allowedOrigins : '*',
     credentials: true
 }));
 app.use(express.json());
-
-// Routes
-app.get('/', (req, res) => res.json({ status: 'Server is running', service: 'AstroAdmin API' }));
-app.use('/api/admin', adminRoutes);
 
 // Detailed Request Logging Middleware (Development)
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.path}`);
     next();
 });
+
+// Routes
+app.get('/', (req, res) => res.json({ status: 'Server is running', service: 'AstroAdmin API' }));
+app.use('/api/admin', adminRoutes);
+
+const { submitPublicReview, getPublicReviews } = require('./controllers/reviewController');
+app.post('/api/reviews', submitPublicReview);
+app.get('/api/reviews', getPublicReviews);
 
 // Start Server & Connect to DB
 const PORT = process.env.PORT || 5000;

@@ -8,13 +8,43 @@ const bookingSchema = new mongoose.Schema({
 
     // Status tracking
     status: { type: String, enum: ['Completed', 'Failed', 'Pending'], default: 'Pending' },
+    callStatus: {
+        type: String,
+        enum: ['Pending', 'In Call', 'Completed', 'No Answer', 'Rescheduled'],
+        default: 'Pending'
+    },
+    callDuration: { type: String, default: '' },
     completedAt: { type: Date },
+    followUpDate: { type: Date },
+    // Customer Real-Time Progress Tracker (ప్రస్తుత పురోగతి)
+    // 1: దక్షిణ సమర్పణ (Payment Confirmed), 2: జాతక గణన (Horoscope Analysis), 3: ప్రత్యక్ష కాల్ (Live Call), 4: సంప్రదింపు పూర్తి (Completed)
+    progressStep: { type: Number, default: 2, min: 1, max: 4 },
+    astrologerUpdateNote: { type: String, default: '' },
     isRead: { type: Boolean, default: false },
+
+    // Astrologer Remedies & Consultation Notes (పరిహారాలు)
+    remedies: {
+        gemstones: { type: String, default: '' },
+        poojas: { type: String, default: '' },
+        mantras: { type: String, default: '' },
+        generalNotes: { type: String, default: '' },
+        recordedAt: { type: Date }
+    },
 
     // Core Consultation Info
     consultationType: { type: String, required: true },
+    // List price as text, like "₹701". The amount paid is finalPrice.
     price: { type: String },
-    
+    originalPrice: { type: Number },
+    finalPrice: { type: Number },
+    discountAmount: { type: Number },
+    couponCode: { type: String },
+    isVipOrder: { type: Boolean },
+    isRepeatCustomer: { type: Boolean },
+    bookingNumber: { type: Number },
+    // Set by the main site: bookings made from a developer machine are 'testing'
+    environment: { type: String },
+
     // Primary Client Information
     fullName: { type: String },
     phone: { type: String, required: true },

@@ -5,6 +5,9 @@ import Dashboard from './pages/Dashboard';
 import Bookings from './pages/Bookings';
 import BookingDetail from './pages/BookingDetail';
 import Contacts from './pages/Contacts';
+import Reviews from './pages/Reviews';
+import Coupons from './pages/Coupons';
+import CosmicBackground from './components/CosmicBackground';
 import useAuthStore from './store/authStore';
 import './index.css';
 
@@ -13,6 +16,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <CosmicBackground />
       <Routes>
         <Route 
           path="/login" 
@@ -25,6 +29,8 @@ function App() {
           <Route path="bookings" element={<Bookings />} />
           <Route path="bookings/:id" element={<BookingDetail />} />
           <Route path="contacts" element={<Contacts />} />
+          <Route path="reviews" element={<Reviews />} />
+          <Route path="coupons" element={<Coupons />} />
         </Route>
         
         {/* Fallback - Only redirect if not a valid route */}

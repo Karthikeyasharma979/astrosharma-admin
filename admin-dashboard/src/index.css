@@ -1,36 +1,117 @@
 @import "tailwindcss";
+@plugin "tailwindcss-animate";
 
 @theme {
-  --color-primary: #8b5cf6;
-  --color-primary-dark: #7c3aed;
+  --color-primary: #f59e0b;
+  --color-primary-dark: #d97706;
+  --color-cream: #fff8e7;
   --color-background: #0f172a;
   --color-surface: #1e293b;
   --color-surface-hover: #334155;
-  --color-text: #f8fafc;
+  --color-text: #fff8e7;
   --color-text-muted: #cbd5e1;
   --color-border: #334155;
 }
 
 @layer base {
   body {
-    @apply bg-slate-900 text-slate-100 font-sans antialiased m-0 min-h-screen selection:bg-purple-500/30;
+    @apply bg-slate-900 text-slate-100 font-sans antialiased m-0 min-h-screen selection:bg-amber-500/40;
+  }
+
+  * {
+    @apply transition-colors duration-300;
   }
 }
 
 @layer components {
+  /* Modern Glass Panel */
   .glass-panel {
-    @apply bg-slate-800/60 backdrop-blur-md border border-slate-700/50 rounded-2xl shadow-xl;
-  }
-  
-  .btn-primary {
-    @apply flex items-center justify-center px-4 py-2 font-medium text-white bg-gradient-to-r from-violet-600 to-purple-600 rounded-lg shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:from-violet-500 hover:to-purple-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-900;
-  }
-  
-  .input-field {
-    @apply w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors duration-200;
+    @apply relative bg-slate-800/40 backdrop-blur-xl border border-slate-700/30 rounded-2xl shadow-2xl hover:shadow-2xl hover:border-slate-600/50 transition-all duration-300;
   }
 
+  .glass-panel::before {
+    @apply absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none;
+    content: '';
+  }
+  
+  /* Primary Button */
+  .btn-primary {
+    @apply relative flex items-center justify-center px-4 py-2.5 font-semibold text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 rounded-xl shadow-lg shadow-amber-500/25 hover:shadow-lg hover:shadow-amber-400/40 hover:from-amber-300 hover:via-amber-400 hover:to-orange-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-slate-900 active:scale-95 overflow-hidden;
+  }
+
+  .btn-primary::before {
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-500 pointer-events-none;
+    content: '';
+  }
+  
+  /* Input Field */
+  .input-field {
+    @apply w-full px-4 py-2.5 bg-slate-900/50 border border-slate-700/50 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300 backdrop-blur-sm;
+  }
+
+  /* Premium Gradient Text */
   .premium-gradient {
-    @apply bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-amber-200 via-[#fff8e7] to-amber-400 bg-clip-text text-transparent;
+  }
+
+  /* Modern Card Styles */
+  .card-modern {
+    @apply relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-lg border border-slate-700/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:border-slate-600/50;
+  }
+
+  .card-modern::before {
+    @apply absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none;
+    content: '';
+  }
+
+  /* Glow effect */
+  .glow-effect {
+    @apply relative before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-r before:from-cyan-500/20 before:to-blue-500/20 before:blur-xl before:-z-10;
+  }
+
+  /* Smooth animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+
+  /* Smooth fade and slide in */
+  .fade-in {
+    @apply animate-in fade-in duration-500;
+  }
+
+  .slide-in {
+    @apply animate-in slide-in-from-bottom-4 duration-500;
+  }
+}
+
+@layer utilities {
+  /* Backdrop blur utilities */
+  .backdrop-blur-xs {
+    @apply backdrop-blur-[2px];
+  }
+
+  /* Gradient text animation */
+  .gradient-animation {
+    @apply bg-gradient-to-r from-cyan-400 via-blue-400 via-purple-400 to-pink-400 bg-[length:200%_auto];
+    animation: gradient 3s linear infinite;
+  }
+
+  @keyframes gradient {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
   }
 }

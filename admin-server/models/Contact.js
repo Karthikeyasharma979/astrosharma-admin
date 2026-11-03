@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const contactSchema = new mongoose.Schema({
-    name: { type: String, required: true },
+    // The main site's contact form saves firstName and lastName
+    name: { type: String },
+    firstName: { type: String },
+    lastName: { type: String },
+    hasAttachment: { type: Boolean },
     email: { type: String, required: true },
     message: { type: String, required: true },
     // Status to track if the inquiry was addressed

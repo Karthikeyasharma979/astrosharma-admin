@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
 import useAuthStore from '../store/authStore';
-import { Lock, Mail, Loader2 } from 'lucide-react';
+import { Lock, Mail, Loader2, Moon } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -32,16 +32,16 @@ const Login = () => {
     return (
         <div className="min-h-screen bg-background relative flex items-center justify-center overflow-hidden">
             {/* Ambient Background Effects */}
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[128px] pointer-events-none"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-[128px] pointer-events-none"></div>
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/15 rounded-full blur-[128px] pointer-events-none"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#fff8e7]/15 rounded-full blur-[128px] pointer-events-none"></div>
             
             <div className="relative z-10 w-full max-w-md p-8 sm:p-10 -mt-10">
                 <div className="glass-panel p-8">
                     <div className="text-center mb-10">
-                        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-violet-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/20 mb-6">
-                            <span className="text-white text-2xl font-bold">A</span>
+                        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/25 mb-6">
+                            <Moon size={32} className="text-slate-950 fill-[#fff8e7]/60" />
                         </div>
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent mb-2">AstroAdmin</h1>
+                        <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-200 via-[#fff8e7] to-amber-400 bg-clip-text text-transparent mb-2">AstroAdmin</h1>
                         <p className="text-slate-400 text-sm">Secure Portal Login</p>
                     </div>
 
